@@ -1,14 +1,11 @@
 import streamlit as st
 import PyPDF2
-import spacy
 import plotly.express as px
 
 st.set_page_config(
     page_title="AI Resume Analyzer",
     layout="wide"
 )
-
-nlp = spacy.load("en_core_web_sm")
 
 st.title("AI Resume Analyzer")
 st.write("Upload a resume to analyze skills, ATS compatibility, and job role suitability.")
@@ -32,6 +29,9 @@ if uploaded_file is not None:
     st.subheader("Extracted Resume Content")
     st.write(text)
 
+    # -----------------------------
+    # Resume length analysis
+    # -----------------------------
     word_count = len(text.split())
 
     st.subheader("Resume Length Analysis")
@@ -44,6 +44,9 @@ if uploaded_file is not None:
     else:
         st.success("Resume length is appropriate.")
 
+    # -----------------------------
+    # Skill detection
+    # -----------------------------
     skills = [
         "python","java","javascript","sql",
         "html","css","git","github",
@@ -59,11 +62,16 @@ if uploaded_file is not None:
     st.subheader("Detected Skills")
     st.write(found_skills)
 
+    # -----------------------------
+    # Resume score
+    # -----------------------------
     score = len(found_skills) * 10
-
     if score > 100:
         score = 100
 
+    # -----------------------------
+    # ATS Score
+    # -----------------------------
     ats_score = 0
 
     if "github" in text_lower:
@@ -86,6 +94,9 @@ if uploaded_file is not None:
     col2.metric("ATS Score", ats_score)
     col3.metric("Skills Detected", len(found_skills))
 
+    # -----------------------------
+    # Resume strength
+    # -----------------------------
     st.subheader("Resume Strength Evaluation")
 
     if score < 40:
@@ -95,6 +106,9 @@ if uploaded_file is not None:
     else:
         st.success("Resume strength is high.")
 
+    # -----------------------------
+    # Job role compatibility
+    # -----------------------------
     st.subheader("Job Role Compatibility")
 
     roles = {
@@ -117,6 +131,9 @@ if uploaded_file is not None:
 
         st.write(role + " : " + str(percentage) + "% match")
 
+    # -----------------------------
+    # Skill gap analysis
+    # -----------------------------
     st.subheader("Skill Gap Analysis")
 
     required_skills = ["python","java","sql","git","github"]
@@ -132,6 +149,9 @@ if uploaded_file is not None:
     else:
         st.write("No significant skill gaps detected.")
 
+    # -----------------------------
+    # Skill chart
+    # -----------------------------
     st.subheader("Skill Visualization")
 
     values = []
@@ -151,17 +171,20 @@ if uploaded_file is not None:
 
     st.plotly_chart(fig, use_container_width=True)
 
+    # -----------------------------
+    # Resume summary (simple NLP)
+    # -----------------------------
     st.subheader("Resume Summary")
 
-    doc = nlp(text)
-
-    sentences = [sent.text for sent in doc.sents]
-
+    sentences = text.split(".")
     summary = sentences[:3]
 
     for s in summary:
-        st.write(s)
+        st.write(s.strip())
 
+    # -----------------------------
+    # Suggestions
+    # -----------------------------
     st.subheader("Improvement Suggestions")
 
     suggestions = []
@@ -184,6 +207,9 @@ if uploaded_file is not None:
     else:
         st.write("The resume appears strong.")
 
+    # -----------------------------
+    # Download report
+    # -----------------------------
     report = f"""
 Resume Score: {score}
 ATS Score: {ats_score}
@@ -197,4 +223,4 @@ Missing Skills: {missing_skills}
     )
 
 st.markdown("---")
-st.write("AI Resume Analyzer | Python, Streamlit, spaCy")
+st.write("AI Resume Analyzer | Python, Streamlit")
